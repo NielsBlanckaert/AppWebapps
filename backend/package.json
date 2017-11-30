@@ -1,0 +1,24 @@
+{
+  "name": "restaurantapp",
+  "version": "0.0.0",
+  "description": "MEAN app voor opleidingsonderdeel 3TI: webapps",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
+  },
+  "dependencies": {
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "cors": "*",
+    "dotenv": "^4.0.0",
+    "express": "*",
+    "express-jwt": "^5.3.0",
+    "jsonwebtoken": "^8.1.0",
+    "mongoose": "^4.13.5",
+    "passport": "^0.4.0",
+    "passport-jwt": "*",
+    "passport-local": "^1.0.0"
+  },
+  "author": "Blanckaert Niels"
+}
