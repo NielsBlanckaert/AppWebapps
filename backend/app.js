@@ -6,6 +6,10 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const env = require('dotenv').config({path: './secret.env'})
 
+require('./models/restaurant');
+
+const users = require('./routes/users');
+
 // Connect To Database
 mongoose.connect(process.env.DB_URI, {
   useMongoClient: true,
@@ -23,8 +27,6 @@ mongoose.connection.on('error', (err) => {
 });
 
 const app = express();
-
-const users = require('./routes/users');
 
 // Port Number
 const port = process.env.PORT || 8080;

@@ -16,6 +16,9 @@ import {ValidateService} from './services/validate.service';
 import {AuthService} from './services/auth.service';
 import {FlashMessagesModule} from 'angular2-flash-messages';
 import {AuthGuard} from './guards/auth.guard';
+import { RestaurantListComponent } from './components/restaurant/restaurant-list/restaurant-list.component';
+import { RestaurantComponent } from './components/restaurant/restaurant/restaurant.component';
+import { RestaurantDetailComponent } from './components/restaurant/restaurant-detail/restaurant-detail.component';
 
 const appRoutes: Routes =  [
   {path:'', component: HomeComponent},
@@ -33,7 +36,10 @@ const appRoutes: Routes =  [
     RegisterComponent,
     HomeComponent,
     DashboardComponent,
-    ProfileComponent
+    ProfileComponent,
+    RestaurantListComponent,
+    RestaurantComponent,
+    RestaurantDetailComponent
   ],
   imports: [
     BrowserModule,
