@@ -5,7 +5,7 @@ let jwt = require('express-jwt');
 
 let Restaurant = mongoose.model('Restaurant');
 
-let auth = jwt({secret: process.env.RECIPE_BACKEND_SECRET, userProperty: 'payload'});
+let auth = jwt({secret: process.env.BACKEND_SECRET, userProperty: 'payload'});
 
 /* GET home page. */
 router.get('/API/restaurants/', auth, function(req, res, next) {

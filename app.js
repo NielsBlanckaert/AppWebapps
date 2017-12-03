@@ -4,11 +4,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
 const mongoose = require('mongoose');
-const env = require('dotenv').config({path: './secret.env'})
+const env = require('dotenv').config({path: 'secret.env'})
 
 require('./models/restaurant');
 
-const users = require('./routes/users');
+var index = require('./routes/index');
+var users = require('./routes/users');
 
 // Connect To Database
 mongoose.connect(process.env.DB_URI, {
@@ -29,7 +30,7 @@ mongoose.connection.on('error', (err) => {
 const app = express();
 
 // Port Number
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 // CORS Middleware
 app.use(cors());
@@ -47,6 +48,7 @@ app.use(passport.session());
 require('./config/passport');
 
 app.use('/users', users);
+app.use('/', index);
 
 // Index Route
 app.get('/', (req, res) => {
