@@ -4,72 +4,76 @@ let mongoose = require('mongoose');
 let jwt = require('express-jwt');
 
 let Restaurant = mongoose.model('Restaurant');
+let Reactie = mongoose.model('Reactie');
+let User = mongoose.model('User');
 
-let auth = jwt({secret: process.env.BACKEND_SECRET, userProperty: 'payload'});
-
-/* GET home page. */
-router.get('/API/restaurants/', auth, function(req, res, next) {
-  Restaurant.find(function(err, restaurants){
-      if(err){return next(err);}
-      res.json(restaurants)
-  })
+let auth = jwt({
+  secret: process.env.BACKEND_SECRET,
+  userProperty: 'payload'
 });
 
-router.post('/API/restaurant/', function (req, res, next) {
-    let restaurant = new Restaurant(req.body);
-    restaurant.save(function(err, rec) {
-      if (err){ return next(err); }
-      res.json(rec);
-    });
-});  
-
-router.post('/API/recipes/', auth, function (req, res, next) {
-  let recipe = new Recipe({name: req.body.name, directions: req.body.directions});
-  recipe.save(function(err, post) {
-          if (err){ return next(err); }
-          res.json(recipe);
-      });
+// Alle restaurants tonen
+router.get('/restaurants', auth, function (req, res, next) {
+  let query = Restaurant.find().populate("reacties");
+  query.exec(function(err, restaurants) {
+    if (err) return next(err);
+    res.json(restaurants);
   });
+});
 
-  router.param('recipe', function(req, res, next, id) {
-    let query = Recipe.findById(id);
-    query.exec(function (err, recipe){
-      if (err) { return next(err); }
-      if (!recipe) { return next(new Error('not found ' + id)); }
-      req.recipe = recipe;
-      return next();
-    });
-  });  
-
-  router.get('/API/recipe/:recipe', function(req, res) {
-    req.recipe.populate('ingredients', function(err, rec) {
-      if (err) return next(err);
-      res.json(rec);
-    });
+// Restaurant toevoegen
+router.post("/restaurants", auth, function (req, res, next) {
+  let restaurant = new Restaurant(req.body)
+  restaurant.save(function (err, post) {
+    if (err) {
+      return next(err);
+    }
+    res.json(restaurant);
   });
+});
 
-  router.delete('/API/recipe/:recipe', function(req, res, next) {
-    Ingredient.remove({ _id: {$in: req.recipe.ingredients }}, function (err) {
-      if (err) return next(err);
-      req.recipe.remove(function(err) {
-        if (err) { return next(err); }   
-        res.json(req.recipe);
-       });
-    })
-  })
+router.param('/restaurants', function (req, res, next, id) {
+  let query = Restaurant.findById(id);
+  query.exec(function (err, restaurant) {
+    if (err) {
+      return next(err);
+    }
+    if (!restaurant) {
+      return next(new Error('not found ' + id));
+    }
+    req.restaurant = restaurant;
+    return next();
+  });
+});
 
-  router.post('/API/recipe/:recipe/ingredients', function(req, res, next) {
-    let ing = new Ingredient(req.body);
+router.get('/restaurants/:restaurant', function (req, res) {
+  res.json(req.restaurant);
+});
 
-    ing.save(function(err, ingredient) {
-      if (err) return next(err);
+// Reactie toevoegen aan restaurant
+router.post('/restaurants/:id/reacties', auth, function (req, res, next) {
+  let reactie = new Reactie({
+    user: req.payload._id,
+    restaurant: req.params.id,
+    tekst: req.body.tekst,
+    score: req.body.score
+  });
+  console.log(reactie);
 
-      req.recipe.ingredients.push(ingredient);
-      req.recipe.save(function(err, rec) {
-        if (err) return next(err);
-        res.json(ingredient);
+  Restaurant.findByIdAndUpdate({_id: req.params.id}, 
+    {$inc: {totaleScore: req.body.score, aantalBeoordelingen: 1}, $addToSet: {reacties: reactie}},
+    {new: true},
+  function(err, restaurant){
+    if(err) {return next(err)}
+    User.findByIdAndUpdate(req.payload._id, {$addToSet: {beoordeeldeRestaurants: req.params.id}}, function(err, user){
+      if(err) {return next(err)}
+      reactie.save(function (err, reactie) {
+        if (err) { return next(err); }
+        res.json(reactie);
       })
     });
   });
+
+})
 
 module.exports = router;

@@ -1,0 +1,7 @@
+.example-container {
+    margin-left: 20px
+  }
+  
+  .example-container > * {
+    width: 100%;
+  }

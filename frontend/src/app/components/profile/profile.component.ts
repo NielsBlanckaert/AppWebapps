@@ -1,3 +1,4 @@
+import { User } from '../../models/user.model';
 import { Component, OnInit } from '@angular/core';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
@@ -8,13 +9,13 @@ import {Router} from '@angular/router';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  user:Object;
+  user: User;
 
   constructor(private authService:AuthService, private router:Router) { }
 
   ngOnInit() {
     this.authService.getProfile().subscribe(profile => {
-      this.user = profile.user;
+      this.user = profile;
     },
     err => {
       console.log(err);

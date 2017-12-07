@@ -1,8 +1,9 @@
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import {RouterModule, Routes} from '@angular/router';
+import { RouterModule, Routes} from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -19,6 +20,8 @@ import {AuthGuard} from './guards/auth.guard';
 import { RestaurantListComponent } from './components/restaurant/restaurant-list/restaurant-list.component';
 import { RestaurantComponent } from './components/restaurant/restaurant/restaurant.component';
 import { RestaurantDetailComponent } from './components/restaurant/restaurant-detail/restaurant-detail.component';
+
+import { MaterialModule } from './modules/material.io.module';
 
 const appRoutes: Routes =  [
   {path:'', component: HomeComponent},
@@ -43,10 +46,13 @@ const appRoutes: Routes =  [
   ],
   imports: [
     BrowserModule,
-    FormsModule,
+    FormsModule, 
+    ReactiveFormsModule,
     HttpModule,
+    HttpClientModule,
     RouterModule.forRoot(appRoutes),
-    FlashMessagesModule
+    FlashMessagesModule,
+    MaterialModule,
   ],
   providers: [ValidateService, AuthService, AuthGuard],
   bootstrap: [AppComponent]

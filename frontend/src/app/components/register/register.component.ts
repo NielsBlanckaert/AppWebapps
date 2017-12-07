@@ -1,8 +1,23 @@
+import { ValidateService } from '../../services/validate.service';
+import { FlashMessagesService } from 'angular2-flash-messages/module/flash-messages.service';
+import { Observable } from 'rxjs/Rx';
+import { AuthService } from '../../services/auth.service';
 import { Component, OnInit } from '@angular/core';
-import {ValidateService} from '../../services/validate.service';
-import {AuthService} from '../../services/auth.service';
-import {FlashMessagesService} from 'angular2-flash-messages';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators, FormControl } from '@angular/forms';
+
+
+function passwordValidator(length: number): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } => {
+    return control.value.length < length ? { 'passwordTooShort': { requiredLength: length, actualLength: control.value.length } } : null;
+  };
+}
+
+function comparePasswords(control: AbstractControl): { [key: string]: any } {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirmPassword');
+  return password.value === confirmPassword.value ? null : { 'passwordsDiffer': true };
+}
 
 @Component({
   selector: 'app-register',
@@ -10,52 +25,43 @@ import {Router} from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  name: String;
-  username: String;
-  email: String;
-  password: String;
+  public user: FormGroup;
 
-  constructor(
-    private validateService: ValidateService,
-    private flashMessage:FlashMessagesService,
-    private authService:AuthService,
-    private router: Router
-  ) { }
+  get passwordControl(): FormControl {
+    return <FormControl>this.user.get('passwordGroup').get('password');
+  }
+
+  constructor(private authenticationService: AuthService, private router: Router, private fb: FormBuilder) { }
 
   ngOnInit() {
+    this.user = this.fb.group({
+      name:  ['', Validators.required],
+      username: ['', [Validators.required, Validators.minLength(4)], this.serverSideValidateUsername()],
+      email:  ['', Validators.required],
+      passwordGroup: this.fb.group({
+        password: ['', [Validators.required, passwordValidator(12)]],
+        confirmPassword: ['', Validators.required]
+      }, { validator: comparePasswords })
+    });
   }
 
-  onRegisterSubmit(){
-    const user = {
-      name: this.name,
-      email: this.email,
-      username: this.username,
-      password: this.password
-    }
+  serverSideValidateUsername(): ValidatorFn {
+    return (control: AbstractControl): Observable<{ [key: string]: any }> => {
+      return this.authenticationService.checkUserNameAvailability(control.value).map(available => {
+        if (available) {
+          return null;
+        }
+        return { userAlreadyExists: true };
+      });
+    };
+  }
 
-    // Required Fields
-    if(!this.validateService.validateRegister(user)){
-      this.flashMessage.show('Please fill in all fields', {cssClass: 'alert-danger', timeout: 3000});
-      return false;
-    }
-
-    // Validate Email
-    if(!this.validateService.validateEmail(user.email)){
-      this.flashMessage.show('Please use a valid email', {cssClass: 'alert-danger', timeout: 3000});
-      return false;
-    }
-
-    // Register user
-    this.authService.registerUser(user).subscribe(data => {
-      if(data.success){
-        this.flashMessage.show('You are now registered and can log in', {cssClass: 'alert-success', timeout: 3000});
+  onSubmit() {
+    this.authenticationService.register(this.user.value.username, this.passwordControl.value, this.user.value.name, this.user.value.email)
+    .subscribe(val => {
+      if (val) {
         this.router.navigate(['/login']);
-      } else {
-        this.flashMessage.show('Something went wrong', {cssClass: 'alert-danger', timeout: 3000});
-        this.router.navigate(['/register']);
       }
     });
-
   }
-
 }

@@ -1,3 +1,24 @@
-<p>
-  restaurant-list works!
-</p>
+<div>
+    <h4>Restaurants</h4>
+</div>
+<form [formGroup]='_restaurant' (ngSubmit)='onSubmit()'>
+    <p>Voeg een restaurant toe!</p>
+    <mat-form-field>
+        <input formControlName='name' matInput placeholder="Naam restaurant">
+        <div *ngIf='_restaurant.get("name").errors?.required
+        && _restaurant.get("name").touched' class='ui pointing red basic label'>
+            error! this is required
+        </div>
+    </mat-form-field>
+    <mat-form-field>
+        <input formControlName='locatie' matInput placeholder="Adres">
+        <div *ngIf='_restaurant.get("locatie").errors?.required
+        && _restaurant.get("locatie").touched' class='ui pointing red basic label'>
+            error! this is required
+        </div>
+    </mat-form-field>
+    <button type="submit" [disabled]="!_restaurant.valid" mat-raised-button color="primary">Toevoegen</button>
+</form>
+<mat-accordion>
+    <app-restaurant *ngFor="let localRestaurant of restaurants" [restaurant]="localRestaurant"></app-restaurant>
+</mat-accordion>
