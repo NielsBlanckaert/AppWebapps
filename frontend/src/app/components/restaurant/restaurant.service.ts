@@ -8,7 +8,8 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class RestaurantService {
 
-  private _appUrl = 'http://localhost:3000';
+  //private _appUrl = 'http://localhost:3000';
+  private _appUrl =  'https://salty-tor-21384.herokuapp.com';
   private _restaurants;
 
   constructor(private http: HttpClient, private auth: AuthService) { }

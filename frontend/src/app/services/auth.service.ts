@@ -7,7 +7,9 @@ import { tokenNotExpired } from 'angular2-jwt';
 
 @Injectable()
 export class AuthService {
-  private _url = 'http://localhost:3000/users';
+
+  //private _url = 'http://localhost:3000/users';
+  private _url =  'https://salty-tor-21384.herokuapp.com/users';
   private _user$: BehaviorSubject<string>;
 
   public redirectUrl: string;
