@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 let mongoose = require('mongoose');
 let passport = require('passport');
-const env = require('dotenv').config({path: 'secret.env'})
+//const env = require('dotenv').config({path: 'secret.env'})
 
 const port = process.env.PORT || 8080;
 
